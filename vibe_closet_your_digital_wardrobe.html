@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>VIBE CLOSET - Your Digital Wardrobe</title>
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- React & Router Global Scripts -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/history@5/umd/history.development.js"></script>
+    <script src="https://unpkg.com/react-router@6.3.0/umd/react-router.development.js"></script>
+    <script src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#37675f",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#a8dad0",
+                        "on-surface": "#211a14",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "outline": "#707976",
+                        "on-background": "#211a14",
+                        "on-error": "#ffffff",
+                        "secondary": "#765658",
+                        "surface-container-low": "#fff1e6",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "surface-dim": "#e5d8cd",
+                        "primary-fixed": "#baede2",
+                        "on-primary-fixed": "#00201c",
+                        "outline-variant": "#c0c8c5",
+                        "surface-bright": "#fff8f4",
+                        "primary": "#37675f",
+                        "on-surface-variant": "#404846",
+                        "secondary-fixed-dim": "#e5bdbf",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#ffdadb",
+                        "primary-fixed-dim": "#9fd0c6",
+                        "inverse-surface": "#372f28",
+                        "surface": "#fff8f4",
+                        "inverse-primary": "#9fd0c6",
+                        "surface-variant": "#eee0d5",
+                        "background": "#F5E7DC",
+                        "surface-container-high": "#f4e6db",
+                        "on-primary-container": "#316159",
+                        "inverse-on-surface": "#fceee3",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#e5e2e1",
+                        "surface-container-highest": "#eee0d5",
+                        "surface-container": "#faebe0",
+                        "on-secondary-fixed-variant": "#5c3f41",
+                        "on-tertiary-container": "#595858",
+                        "secondary-container": "#ffd6d8",
+                        "on-secondary-fixed": "#2c1517",
+                        "on-secondary-container": "#7a5b5d",
+                        "tertiary-container": "#d2cfcf",
+                        "on-tertiary-fixed-variant": "#474746",
+                        "on-primary-fixed-variant": "#1d4e47",
+                        "tertiary": "#5f5e5e",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "brand-mint": "#A8DAD0",
+                        "brand-blush": "#F2C9CB",
+                        "brand-black": "#1A1A1A"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "0px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "margin-desktop": "40px",
+                        "max-width": "1280px",
+                        "gutter": "16px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Space Mono"],
+                        "headline-lg": ["Space Mono"],
+                        "headline-sm": ["Space Mono"],
+                        "headline-md": ["Space Mono"],
+                        "body-md": ["DM Sans"],
+                        "label-lg": ["Space Mono"],
+                        "headline-lg-mobile": ["Space Mono"],
+                        "body-lg": ["DM Sans"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "14px", "fontWeight": "400" }],
+                        "headline-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-lg": ["14px", { "lineHeight": "16px", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #F5E7DC; min-height: 100vh; }
+        .hard-shadow { box-shadow: 6px 6px 0px 0px #1A1A1A; }
+        .hard-shadow-sm { box-shadow: 2px 2px 0px 0px #1A1A1A; }
+        .retro-border { border: 2px solid #1A1A1A; }
+        .btn-press:active { box-shadow: 0px 0px 0px 0px #1A1A1A; transform: translate(6px, 6px); }
+        .scanline {
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.05));
+            background-size: 100% 4px;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Transition Helpers */
+        .hardware-btn { transition: transform 0.1s ease, box-shadow 0.1s ease; }
+        .hardware-btn:active { transform: translate(2px, 2px); box-shadow: none !important; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-brand-black antialiased">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { createRoot } = ReactDOM;
+        const { MemoryRouter, Routes, Route, Link, useNavigate, useLocation } = ReactRouterDOM;
+
+        // --- Shared Components ---
+
+        const TopAppBar = ({ title = "VIBE CLOSET", leftAction = "menu", rightAction = "power_settings_new", onLeftClick, onRightClick }) => {
+            const navigate = useNavigate();
+            return (
+                <header className="fixed top-0 left-0 w-full z-[60] flex justify-between items-center px-margin-mobile h-14 bg-brand-black text-on-tertiary border-b-2 border-brand-black shrink-0">
+                    <button onClick={onLeftClick} className="hover:opacity-80 active:translate-y-px transition-transform flex items-center justify-center">
+                        <span className="material-symbols-outlined text-on-tertiary">
+                            {leftAction === 'back' ? 'arrow_back' : 'menu'}
+                        </span>
+                    </button>
+                    <h1 onClick={() => navigate('/')} className="font-headline-sm text-headline-sm text-brand-mint tracking-tighter cursor-pointer">{title}</h1>
+                    <button onClick={onRightClick || (() => navigate('/add'))} className="hover:opacity-80 active:translate-y-px transition-transform flex items-center justify-center">
+                        <span className="material-symbols-outlined text-on-tertiary">
+                            {rightAction === 'add' ? 'add_box' : rightAction}
+                        </span>
+                    </button>
+                </header>
+            );
+        };
+
+        const BottomNavBar = () => {
+            const location = useLocation();
+            const path = location.pathname;
+
+            const NavItem = ({ to, icon, label, isActive }) => (
+                <Link to={to} className={`flex flex-col items-center justify-center px-4 py-1 transition-all w-24 ${
+                    isActive 
+                    ? 'bg-brand-mint text-brand-black retro-border hard-shadow-sm active:translate-x-[2px] active:translate-y-[2px] active:shadow-none' 
+                    : 'text-outline hover:text-brand-black'
+                }`}>
+                    <span className={`material-symbols-outlined text-[24px] ${isActive ? 'fill-1' : ''}`} 
+                          style={isActive ? {fontVariationSettings: "'FILL' 1"} : {}}>
+                        {icon}
+                    </span>
+                    <span className={`font-label-sm text-label-sm mt-1 uppercase ${isActive ? 'font-bold' : ''}`}>{label}</span>
+                </Link>
+            );
+
+            return (
+                <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-3 h-20 bg-surface-container-low border-t-2 border-brand-black shrink-0">
+                    <NavItem to="/closet" icon="checkroom" label="Closet" isActive={path === '/closet'} />
+                    <NavItem to="/style" icon="auto_fix_high" label="Style" isActive={path === '/style' || path === '/result'} />
+                    <NavItem to="/looks" icon="style" label="Looks" isActive={path === '/looks'} />
+                </nav>
+            );
+        };
+
+        // --- Screen Components ---
+
+        const SplashPage = () => {
+            const navigate = useNavigate();
+            return (
+                <div className="flex flex-col h-screen">
+                    <TopAppBar />
+                    <main className="w-full max-w-md mx-auto px-margin-mobile flex-1 flex flex-col justify-center items-center py-8 relative">
+                        <section className="w-full retro-border hard-shadow bg-surface-container-lowest flex flex-col overflow-hidden relative">
+                            <div className="bg-brand-black text-on-tertiary px-4 py-2 flex justify-between items-center border-b-2 border-brand-black">
+                                <span className="font-label-sm text-label-sm text-brand-mint uppercase tracking-widest flex items-center gap-2">
+                                    <span className="w-2 h-2 bg-brand-mint animate-pulse"></span> SYSTEM.INIT
+                                </span>
+                                <div className="flex gap-2">
+                                    <div className="w-3 h-3 border border-on-tertiary bg-transparent"></div>
+                                    <div className="w-3 h-3 border border-on-tertiary bg-transparent"></div>
+                                    <div className="w-3 h-3 border border-on-tertiary bg-brand-blush"></div>
+                                </div>
+                            </div>
+                            <div className="p-6 flex flex-col items-center text-center space-y-8 relative z-10 scanline">
+                                <div className="space-y-3 w-full bg-white/80 p-4 retro-border hard-shadow-sm">
+                                    <h2 className="font-headline-lg-mobile text-headline-lg-mobile tracking-tighter uppercase font-headline-md">VIBE CLOSET</h2>
+                                    <div className="h-0.5 w-full bg-brand-black my-2"></div>
+                                    <p className="font-body-md text-body-md font-bold text-tertiary">用你已有的衣服，穿出设计师的样子</p>
+                                </div>
+                                <div className="w-full aspect-[4/3] retro-border hard-shadow-sm bg-brand-blush relative overflow-hidden group">
+                                    <img alt="Wardrobe interface" className="w-full h-full object-cover filter grayscale contrast-125 mix-blend-multiply opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJ6ez2Y9lMdM07nZZ087o1WWT8GzG5OTtsROp_UmU6hK4V9eyN2DZxA_tBA-izilFuuzFnFWXmCh7HBNu5HeT_RWTfISFoSc-fkcsab-47y6v06y4hpyBEqcaebNVdPjmidojoh6AdwPNzzBKjya3lcssWUn-qiUUsAcZ7-gIm0vIe-uvX0D1XSZ_sBabW9xWav5m4NZ1bwPGFDU9wp1QVcmJtSN1Jhg5HiVU-eG9Z1YAsjYPOd7Q8-dA8928U00sR6-4B3QP67gU" />
+                                    <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] mix-blend-overlay"></div>
+                                    <div className="absolute bottom-2 right-2 bg-brand-black text-brand-mint text-[10px] font-headline-md px-1 py-0.5 retro-border border-brand-mint uppercase">Loading_Modules...</div>
+                                </div>
+                                <button onClick={() => navigate('/closet')} className="w-full py-4 bg-brand-mint retro-border hard-shadow btn-press font-headline-sm text-headline-sm uppercase tracking-wide flex items-center justify-center gap-2 group transition-all">
+                                    立即开启数字衣橱 <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                                </button>
+                            </div>
+                        </section>
+                    </main>
+                    <BottomNavBar />
+                </div>
+            );
+        };
+
+        const ClosetPage = () => {
+            const navigate = useNavigate();
+            return (
+                <div className="pt-14 pb-20 min-h-screen bg-surface">
+                    <TopAppBar rightAction="add" />
+                    <main className="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-6">
+                        <div className="flex overflow-x-auto gap-3 pb-4 mb-2 snap-x hide-scrollbar">
+                            {['All', 'Tops', 'Bottoms', 'Outerwear', 'Shoes'].map((cat, i) => (
+                                <button key={cat} className={`snap-start flex-shrink-0 px-4 py-2 font-label-lg text-label-lg border-2 border-on-tertiary-fixed shadow-[2px_2px_0px_0px_rgba(26,26,26,1)] active:shadow-none active:translate-x-px active:translate-y-px transition-all uppercase tracking-wider ${i === 0 ? 'bg-on-tertiary-fixed text-on-tertiary' : 'bg-surface-container-lowest text-on-tertiary-fixed hover:bg-secondary-container'}`}>
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                            {[
+                                { title: 'Classic White Tee', cat: 'Tops', tag: 'Cotton', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuClUErFLBzReI_DTDnYvtP87AOFt9vYI6KC_u0xDKhSG6i9afcwyh6blnAjEDYpxiR3e6QxJ6wGP7yC4hZybvZjCAg5a8E72sL275J90Vod6NVbWlbPtq5XHa6U71j65M1VGsPk1hj9Zcr0LMx6HLvXX0qRs-avbu2u8qx2mBouZweFgxn0D2DBPnHA5tkaEEBa2rjJ5gl0EU3ZWtFJTlYjs33_C6h2Jqpbjf1vLku5T-lJ7F7ZbnSAwYRqQKTTbwfs2dssSpuV8qI' },
+                                { title: 'Retro Denim Skirt', cat: 'Bottoms', tag: 'Denim', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCc1r66SqqP-WII-moa6YsLwOe_k8yN6XzXJlox90nJlp0t28DoR4-pA97umwPv-yjFTl1AnRRaiB5578B5Xgr7oxZNInemZmHjF5iYqIJyxezSDDkWb9knCUtOJ8h-Uh97hqZBdXZCsH0dkq4FYQ0Elbq5Bx2IR4AM56etkI-41HtQCA_8Z48pRGWmQa_gmboL7mgeTxpDYYfMRXb1QefTm4itTeXQQjmThXU-3RgljV7TRyHzYxlfMQkYHSHTiuzv9HQO_XalFQk' },
+                                { title: 'Oversized Blazer', cat: 'Outerwear', tag: 'Linen', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBj_W5oYu-wiXzsG_9YZX6s5XXGVPAs5hKWYoYBU6MCgnWRPvznRduLnvt49Rsa8cGVNi0-TI3yyHCg5Tqh7W7wgaAPQidbKi_btyiVmOMIM5tfd71mR9nCdGtqPskO1JNKIQ2X_lGPr01My17h5NANPJtAqr8ZVaaP9dLUXMmVLLaVNx0vczjWHIcC1tf46sWNNYAH1ygAsT3rv0htWiWQ88dZrjQi5pxx1sTYoiimafK2LkSTtliio9tazY-PY0ntjkTFp8qjZ5M' },
+                                { title: 'Platform Sneakers', cat: 'Shoes', tag: 'Leather', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAhrYdrpbxWAxbFTxThtXlAauKJrLsRT9jeG6wczBleiYMOwHGtGr-0_ruRBJVqc1QrkAjloDRJAqmmcLO-MoCSW_lRKkfnFI7ETwek8Au336looYrdDh05K86CUiZamaAQkYfwCtNG56KexKKQDzwOdO-03YLPmujr5vbZsNLLG8YnGpj4SZL5SuJJlOafyGwoz1RMKEeba7Hk9h5SGNRfRBGuOX9CX7msJzqlZTEfyFOIVEnIWti8c4KUCx93d7aKsYZ1kt7CElw' }
+                            ].map((item, idx) => (
+                                <div key={idx} className="snap-start bg-surface-container-lowest border-2 border-on-tertiary-fixed shadow-[4px_4px_0px_0px_rgba(26,26,26,1)] flex flex-col hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(26,26,26,1)] transition-all cursor-pointer group">
+                                    <div className="h-6 bg-on-tertiary-fixed border-b-2 border-on-tertiary-fixed flex items-center justify-between px-2">
+                                        <span className="font-label-sm text-[10px] text-on-tertiary tracking-widest uppercase truncate">{item.cat}</span>
+                                        <span className="material-symbols-outlined text-on-tertiary text-xs">favorite</span>
+                                    </div>
+                                    <div className="aspect-square p-2 flex items-center justify-center relative overflow-hidden">
+                                        <img alt={item.title} className="object-contain h-full w-full group-hover:scale-105 transition-transform duration-300" src={item.img} />
+                                    </div>
+                                    <div className="p-2 border-t-2 border-on-tertiary-fixed bg-surface-container-lowest flex-grow flex flex-col justify-between">
+                                        <h3 className="font-label-lg text-[12px] leading-tight text-on-tertiary-fixed uppercase mb-1">{item.title}</h3>
+                                        <span className="w-fit px-1.5 py-0.5 bg-secondary-container border border-on-tertiary-fixed font-label-sm text-[10px] text-on-tertiary-fixed uppercase">{item.tag}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div onClick={() => navigate('/add')} className="mb-8 bg-primary-container border-2 border-on-tertiary-fixed shadow-[4px_4px_0px_0px_rgba(26,26,26,1)] p-6 flex items-center justify-between cursor-pointer hover:shadow-[6px_6px_0px_0px_rgba(26,26,26,1)] hover:-translate-y-0.5 transition-all active:shadow-none active:translate-x-px active:translate-y-px mt-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-on-tertiary-fixed flex items-center justify-center border-2 border-on-tertiary-fixed">
+                                    <span className="material-symbols-outlined text-on-tertiary text-2xl">photo_camera</span>
+                                </div>
+                                <div>
+                                    <h2 className="font-headline-sm text-headline-sm uppercase tracking-tight text-on-tertiary-fixed">Add New Items</h2>
+                                    <p className="font-label-sm text-label-sm uppercase text-on-tertiary-fixed opacity-70">Tap to snap your wardrobe</p>
+                                </div>
+                            </div>
+                            <span className="material-symbols-outlined text-on-tertiary-fixed">arrow_forward</span>
+                        </div>
+                    </main>
+                    <BottomNavBar />
+                </div>
+            );
+        };
+
+        const StylePage = () => {
+            const navigate = useNavigate();
+            const [selected, setSelected] = useState(null);
+
+            const skills = [
+                { id: 1, title: '90s Chanel Chic', desc: 'Tweed, chains, and structured nostalgia.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD8Mjl9flz1r1h1rlnZi_WD4XIdwr76RXiTDUptIBGhiW3gjlcQT6wiemrfXj4X_HcgIbWbNUKsrreHkK0huENqV9h7GpIJAno02KcUwSEvOQvo47cTMlwuujGAw-HkwZUQoG52-WBfc6PkVJ8qKDshSwRD_-MG5d2joCNcvSL9XZDI8Se2wnEx3kShPVAF_TpurvIYnGsBwVTUiyQrtMe6biJftVvw14Ziaph7O3FLYOhyWu8nAtzkzHW7jxXDthugMvlePEVs3c0', color: 'bg-primary' },
+                { id: 2, title: 'Prada Minimalism', desc: 'Nylon, sharp lines, utilitarian edge.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC8ffErfC8IFOvlmSf6u5x-h7aDHBYUt7uBpLkZ-nmXMI30IfD7iBoHdPvCZKdVjZB01K2srVbN0Wv7NUy7Qd87W7791_acblEC2r66ZkC_mXxlUQNrorHAxaCbf-sU2jH1K5Ll7_X-OBmlsBQTxGTMPlk-nLFY7y_SAGJMStfw4vSQXNZt3RugSFozEKq3_Nd4F9dY8fJ4juyAlqLgHlTfGPrzSzsoVjdVUVrkUhdqsz_j_OzhmZyrL0lqi9x7mxW52Oxcl1XrPvA', color: 'bg-tertiary-container' },
+                { id: 3, title: 'Westwood Punk', desc: 'Tartan, rebellion, asymmetric cuts.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDJhJZrOgdoDuSSwVfVW6xKk8cOt-fARNT8qF6ZNYB18AjwDJZLO3TShIvAOLEluIXgKQv5lALcNUe9GQNG5R6SAlS2lbb4xi1PzEsSOqdgfVWQrWomcs9ot7WXAONo0MpaSdxY5lP1y_uoWlaOs_dJg7q54J-2Ipxm9s_0bY52sG0RUkg0b5LdnGgPPs6r-cR_b1PBUWRaN5eagQZOh4V5gW0QzAJYBwNzX2JxMknnbTc8gfErRm4_eun5XrFqRwRKxDGV28bxBhY', color: 'bg-error-container' },
+                { id: 4, title: 'Poolside Retro', desc: 'Pastels, terrycloth, endless summer.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCaIFL9BFmqNzmRCiL8x6MeBi97D6z2Le32c4sT7PnF5Zd3tLzZGlDvJN8eW4YuYczf-5qwA-kK08kHjNVJisZj9jy7_BJW6OSdYXOjbs1vf4vk1-raGJiVkB532tzOKzg3XnRiKWHg0wKA1edj8XU_rpujSvEZwgFnyfHKDuOgiXmSKPN7WNNbHBt3nQGjw4NE98qvsiDIb2gLuPU5_NZYEgpBBVxZbkfNdkUxiyh0xJ1FeWBDGq-SyHvM3-dlcwMWrGea_wgXSY4', color: 'bg-primary-container' }
+            ];
+
+            return (
+                <div className="pt-24 pb-32 min-h-screen bg-surface-container-high" style={{backgroundImage: 'radial-gradient(#d2cfcf 1px, transparent 0)', backgroundSize: '16px 16px'}}>
+                    <TopAppBar />
+                    <main className="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop w-full">
+                        <div className="mb-8 border-2 border-on-tertiary-fixed bg-surface-container-lowest p-4 hard-shadow-sm">
+                            <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-on-tertiary-fixed uppercase">CHOOSE YOUR VIBE</h2>
+                            <p className="font-body-md text-body-md text-on-surface-variant mt-2 border-t-2 border-on-tertiary-fixed pt-2">Select a style skill to calibrate your algorithm.</p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {skills.map(skill => (
+                                <article 
+                                    key={skill.id} 
+                                    onClick={() => setSelected(skill.id)}
+                                    className={`border-2 border-on-tertiary-fixed hard-shadow flex flex-col group cursor-pointer transition-all active:shadow-none active:translate-x-[4px] active:translate-y-[4px] ${selected === skill.id ? 'bg-primary-container' : 'bg-surface-container-lowest'}`}
+                                >
+                                    <div className="bg-on-tertiary-fixed text-on-tertiary px-3 py-1 flex justify-between items-center border-b-2 border-on-tertiary-fixed">
+                                        <span className="font-label-sm text-label-sm uppercase tracking-widest">SKILL_0{skill.id}.EXE</span>
+                                        <span className="material-symbols-outlined text-[16px]">close</span>
+                                    </div>
+                                    <div className={`h-48 relative overflow-hidden border-b-2 border-on-tertiary-fixed ${skill.color}`}>
+                                        <img className="w-full h-full object-cover filter contrast-125 mix-blend-hard-light group-hover:scale-105 transition-transform duration-500" src={skill.img} alt={skill.title} />
+                                    </div>
+                                    <div className="p-4 flex justify-between items-end">
+                                        <div>
+                                            <h3 className="font-headline-md text-headline-md text-on-tertiary-fixed uppercase">{skill.title}</h3>
+                                            <p className="font-body-md text-body-md text-on-surface-variant mt-1">{skill.desc}</p>
+                                        </div>
+                                        <div className={`w-8 h-8 rounded-full border-2 border-on-tertiary-fixed flex items-center justify-center transition-colors ${selected === skill.id ? 'bg-on-tertiary-fixed text-on-tertiary' : 'group-hover:bg-primary-container'}`}>
+                                            <span className="material-symbols-outlined text-[18px]">check</span>
+                                        </div>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+                    </main>
+                    {selected && (
+                        <div className="fixed bottom-24 right-margin-mobile md:right-margin-desktop z-40">
+                            <button onClick={() => navigate('/result')} className="bg-secondary-container border-2 border-on-tertiary-fixed px-6 py-3 flex items-center gap-2 hard-shadow-sm hardware-btn">
+                                <span className="font-label-lg text-label-lg text-on-tertiary-fixed uppercase">Generate Look</span>
+                                <span className="material-symbols-outlined text-on-tertiary-fixed">auto_fix_high</span>
+                            </button>
+                        </div>
+                    )}
+                    <BottomNavBar />
+                </div>
+            );
+        };
+
+        const ResultPage = () => {
+            const navigate = useNavigate();
+            return (
+                <div className="pt-14 pb-24 min-h-screen bg-background">
+                    <TopAppBar />
+                    <main className="w-full max-w-[600px] mx-auto px-margin-mobile py-4 flex flex-col flex-1 gap-4">
+                        <div className="bg-secondary-container border-2 border-on-tertiary-fixed shadow-[4px_4px_0px_0px_#1c1b1b] p-4 text-center">
+                            <h2 className="font-headline-md text-headline-md text-on-tertiary-fixed uppercase">Your 90s Minimalist Look for the weekend</h2>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="col-span-2 md:col-span-1 bg-surface-container-lowest border-2 border-on-tertiary-fixed p-2 flex flex-col h-[220px]">
+                                <div className="bg-on-tertiary-fixed text-on-tertiary font-label-sm text-label-sm px-2 py-1 mb-2 inline-flex items-center gap-1 w-max">
+                                    <span className="material-symbols-outlined text-[14px]">apparel</span> TOP
+                                </div>
+                                <div className="flex-1 bg-surface-variant border border-on-tertiary-fixed bg-cover bg-center" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuClUErFLBzReI_DTDnYvtP87AOFt9vYI6KC_u0xDKhSG6i9afcwyh6blnAjEDYpxiR3e6QxJ6wGP7yC4hZybvZjCAg5a8E72sL275J90Vod6NVbWlbPtq5XHa6U71j65M1VGsPk1hj9Zcr0LMx6HLvXX0qRs-avbu2u8qx2mBouZweFgxn0D2DBPnHA5tkaEEBa2rjJ5gl0EU3ZWtFJTlYjs33_C6h2Jqpbjf1vLku5T-lJ7F7ZbnSAwYRqQKTTbwfs2dssSpuV8qI')"}}></div>
+                            </div>
+                            <div className="col-span-1 bg-surface-container-lowest border-2 border-on-tertiary-fixed p-2 flex flex-col h-[200px]">
+                                <div className="bg-on-tertiary-fixed text-on-tertiary font-label-sm text-label-sm px-2 py-1 mb-2 inline-flex items-center gap-1 w-max">
+                                    <span className="material-symbols-outlined text-[14px]">straighten</span> BOTTOM
+                                </div>
+                                <div className="flex-1 bg-surface-variant border border-on-tertiary-fixed bg-cover bg-center" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDCD2p_OAzUC1f6fgnGlTHg5zqU6PHIDI9Ct-AF51lZnZTgn-6VbOvd1d78rm41TtD31wTh-koSHx6f4eOcP_lhZ5TlvIe4uJOXMSfIF35FrhPz4p-LjIDIHai8f-SwdhY0y9lKjEapX8yzzdvdRlSHckvPvcu86oxinZ7zBF6V2eepaEy1uM5OJ77Sjov_oNa54S3t9UkOS6fVdeqqA8i0S6f3rem2DfPcL9DVKjIrI_OksZ_qPlMD8iSVDbKdzoMVkwYPaqxgnwM')"}}></div>
+                            </div>
+                            <div className="col-span-1 bg-surface-container-lowest border-2 border-on-tertiary-fixed p-2 flex flex-col h-[180px]">
+                                <div className="bg-on-tertiary-fixed text-on-tertiary font-label-sm text-label-sm px-2 py-1 mb-2 inline-flex items-center gap-1 w-max">
+                                    <span className="material-symbols-outlined text-[14px]">footprint</span> SHOES
+                                </div>
+                                <div className="flex-1 bg-surface-variant border border-on-tertiary-fixed bg-cover bg-center" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAhrYdrpbxWAxbFTxThtXlAauKJrLsRT9jeG6wczBleiYMOwHGtGr-0_ruRBJVqc1QrkAjloDRJAqmmcLO-MoCSW_lRKkfnFI7ETwek8Au336looYrdDh05K86CUiZamaAQkYfwCtNG56KexKKQDzwOdO-03YLPmujr5vbZsNLLG8YnGpj4SZL5SuJJlOafyGwoz1RMKEeba7Hk9h5SGNRfRBGuOX9CX7msJzqlZTEfyFOIVEnIWti8c4KUCx93d7aKsYZ1kt7CElw')"}}></div>
+                            </div>
+                        </div>
+                        <div className="flex gap-4 mt-2">
+                            <button onClick={() => navigate('/style')} className="flex-1 bg-surface text-on-tertiary-fixed border-2 border-on-tertiary-fixed shadow-[4px_4px_0px_0px_#1c1b1b] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] py-3 px-2 font-label-lg text-[13px] uppercase flex items-center justify-center gap-2 transition-all hover:bg-surface-container-high">
+                                <span className="material-symbols-outlined text-[18px]">refresh</span> Regen
+                            </button>
+                            <button onClick={() => navigate('/looks')} className="flex-1 bg-primary-container text-on-primary-fixed border-2 border-on-tertiary-fixed shadow-[4px_4px_0px_0px_#1c1b1b] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] py-3 px-2 font-label-lg text-[13px] uppercase flex items-center justify-center gap-2 transition-all">
+                                <span className="material-symbols-outlined text-[18px]" style={{fontVariationSettings: "'FILL' 1"}}>favorite</span> Save
+                            </button>
+                        </div>
+                    </main>
+                    <BottomNavBar />
+                </div>
+            );
+        };
+
+        const LooksPage = () => {
+            const navigate = useNavigate();
+            return (
+                <div className="pt-14 pb-20 min-h-screen bg-surface">
+                    <TopAppBar />
+                    <main className="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-8">
+                        <div className="mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
+                            <div>
+                                <h1 className="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg text-on-tertiary-fixed uppercase">Lookbook</h1>
+                                <p className="font-body-md text-body-md text-on-surface-variant mt-2 max-w-md">Your curated collection of fits.</p>
+                            </div>
+                            <button onClick={() => navigate('/style')} className="bg-primary-container text-on-tertiary-fixed border-2 border-on-tertiary-fixed shadow-[2px_2px_0px_0px_#1c1b1b] px-6 py-2 font-label-lg text-label-lg uppercase flex items-center gap-2 self-start md:self-auto active:translate-x-px active:translate-y-px active:shadow-none transition-all">
+                                <span className="material-symbols-outlined text-[18px]">add</span> New Look
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                            <article className="bg-surface-container-lowest border-2 border-on-tertiary-fixed shadow-[4px_4px_0px_0px_#1c1b1b] flex flex-col group transition-transform hover:-translate-y-1">
+                                <div className="bg-on-tertiary-fixed text-on-tertiary px-3 py-2 flex justify-between items-center border-b-2 border-on-tertiary-fixed">
+                                    <span className="font-label-lg text-label-lg uppercase">L-042 // Midnight</span>
+                                    <span className="material-symbols-outlined text-[16px]">favorite</span>
+                                </div>
+                                <div className="p-4 h-80 relative bg-[radial-gradient(#c0c8c5_1px,transparent_1px)] bg-[size:16px_16px] overflow-hidden">
+                                    <div className="absolute top-2 left-4 w-44 h-60 border-2 border-on-tertiary-fixed shadow-[4px_4px_0px_0px_#1c1b1b] bg-[#F5E7DC] overflow-hidden rotate-[-3deg] z-10">
+                                        <img className="w-full h-full object-cover grayscale mix-blend-multiply group-hover:grayscale-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqVpjq6MLLvHizDW8MuHLOeKl3TpcLi6PVSb5lKO5MOHdrm9KGiLyhi-aoChqLDOU-FwqPvSOFs0w_zSKJTgekXlJlv0m_v8ZVDRAsvReTnFKYlR8av3_Y3RDzkwt-FFoVwnwmSWCk3b8eLjfixXFeODIa6rAtmSN1d9ZRcuf7CS945dBufQR6eHo7LY34A30J4WUqsNw_r8V0Pizo-g3NYlj8IoFyvHsr2mQK1pgIsqkVbzVtxUkCvNSBC8dhLXRyZD3sx0jBNyQ" />
+                                    </div>
+                                    <div className="absolute bottom-6 right-4 w-36 h-36 border-2 border-on-tertiary-fixed shadow-[4px_4px_0px_0px_#1c1b1b] bg-[#F5E7DC] overflow-hidden rotate-[4deg] z-30">
+                                        <img className="w-full h-full object-cover grayscale mix-blend-multiply group-hover:grayscale-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDn8J5yICLBH7zWDn7OgBmSoHHrRqfVI3CEA6Hh8kug-OI16dhD4h5hzMYz-2VG807jri83BkaclZju1qXOLY39Xqi5yys8g3xr5QkqBUFSDgANtCAklVgwRFRJrbfxutWCjpDOg2rqAE3V0n_XRk3_nIT32BHOT4eQsY11-Zb3Q5_iV6xJ6kpe-kvEAwhHdcXx0z3LYMkPqyDKEO2GW24peiyTqz764P3JCGZMz5ArVmLEJDnVzraK9PHCu3h_zZmst4J62GgG8h0" />
+                                    </div>
+                                    <div className="absolute top-6 right-8 w-28 h-28 border-2 border-on-tertiary-fixed shadow-[4px_4px_0px_0px_#1c1b1b] bg-secondary-container flex items-center justify-center p-2 rotate-[2deg] z-20">
+                                        <span className="font-headline-sm text-headline-sm text-on-tertiary-fixed text-center uppercase tracking-tighter">Date<br/>Night</span>
+                                    </div>
+                                </div>
+                                <div className="border-t-2 border-on-tertiary-fixed p-3 flex justify-between items-center bg-surface">
+                                    <span className="inline-block px-2 py-0.5 border border-on-tertiary-fixed font-label-sm text-label-sm uppercase bg-primary-container text-on-tertiary-fixed">Silks</span>
+                                    <span className="font-label-sm text-label-sm text-on-surface-variant">Last worn: 2w ago</span>
+                                </div>
+                            </article>
+                            <article className="bg-surface-container-lowest border-2 border-on-tertiary-fixed shadow-[4px_4px_0px_0px_#1c1b1b] flex flex-col group transition-transform hover:-translate-y-1">
+                                <div className="bg-on-tertiary-fixed text-on-tertiary px-3 py-2 flex justify-between items-center border-b-2 border-on-tertiary-fixed">
+                                    <span className="font-label-lg text-label-lg uppercase">L-018 // Sunday</span>
+                                    <span className="material-symbols-outlined text-[16px] text-primary-container" style={{fontVariationSettings: "'FILL' 1"}}>favorite</span>
+                                </div>
+                                <div className="p-4 h-80 relative bg-[radial-gradient(#c0c8c5_1px,transparent_1px)] bg-[size:16px_16px] overflow-hidden">
+                                    <div className="absolute top-4 left-4 w-52 h-52 border-2 border-on-tertiary-fixed shadow-[4px_4px_0px_0px_#1c1b1b] bg-[#F5E7DC] overflow-hidden rotate-[-2deg] z-10">
+                                        <img className="w-full h-full object-cover grayscale mix-blend-multiply group-hover:grayscale-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB895XeXobOWI063-vEcbkTHl7e6bVXUCGETHKKsXh28o4-dZef6FZHoIHKrNQWcixFgJ_XmUQKJndJNHppQGl-ElzTNaVgMrqk8bhEwJ_iZsoKvVl14TN7oMt4XfGk8rGVTNAjlRaqlIlZNuXyuR13nnAzXrqLkpvpNFNzu-6CC2f2r7HqEE14vVsXmlfTkZWifNFvk1qlecdQtQf2kEX4B3Z5IH9DMdF4olQmiQHKUm-5GTojlEvAEFLIGZW1AHjFGo89oPeLUEo" />
+                                    </div>
+                                    <div className="absolute top-8 right-12 w-24 h-24 border-2 border-on-tertiary-fixed shadow-[4px_4px_0px_0px_#1c1b1b] bg-primary-container flex items-center justify-center rotate-[5deg] z-30">
+                                        <span className="material-symbols-outlined text-[36px] text-on-tertiary-fixed">local_cafe</span>
+                                    </div>
+                                </div>
+                                <div className="border-t-2 border-on-tertiary-fixed p-3 flex justify-between items-center bg-surface">
+                                    <span className="inline-block px-2 py-0.5 border border-on-tertiary-fixed font-label-sm text-label-sm uppercase bg-surface-container-high text-on-tertiary-fixed">Casual</span>
+                                    <span className="font-label-sm text-label-sm text-on-surface-variant">Last worn: 3d ago</span>
+                                </div>
+                            </article>
+                        </div>
+                    </main>
+                    <BottomNavBar />
+                </div>
+            );
+        };
+
+        const AddItemPage = () => {
+            const navigate = useNavigate();
+            return (
+                <div className="flex flex-col min-h-screen bg-surface">
+                    <TopAppBar title="ADD NEW ITEM" leftAction="back" onLeftClick={() => navigate(-1)} rightAction="none" />
+                    <main className="flex-1 mt-14 mb-[100px] px-margin-mobile py-6 flex flex-col gap-6">
+                        <button className="hardware-btn w-full aspect-square bg-surface-container-lowest border-2 border-on-tertiary-fixed shadow-[4px_4px_0px_0px_rgba(26,26,26,1)] flex flex-col items-center justify-center gap-4 relative overflow-hidden group">
+                            <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-on-tertiary-fixed"></div>
+                            <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-on-tertiary-fixed"></div>
+                            <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-on-tertiary-fixed"></div>
+                            <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-on-tertiary-fixed"></div>
+                            <span className="material-symbols-outlined text-6xl text-on-surface group-hover:scale-110 transition-transform duration-300" style={{fontVariationSettings: "'FILL' 0, 'wght' 200"}}>photo_camera</span>
+                            <span className="font-headline-sm text-headline-sm text-on-surface uppercase tracking-tight">TAP TO TAKE PHOTO</span>
+                        </button>
+                        <div className="flex gap-4">
+                            <button className="hardware-btn flex-1 bg-secondary-container border-2 border-on-tertiary-fixed shadow-[2px_2px_0px_0px_rgba(26,26,26,1)] py-4 flex flex-col items-center justify-center gap-2 px-2">
+                                <span className="material-symbols-outlined text-2xl text-on-surface">photo_library</span>
+                                <span className="font-label-lg text-label-lg text-on-surface text-center uppercase">Album</span>
+                            </button>
+                            <button className="hardware-btn flex-1 bg-secondary-container border-2 border-on-tertiary-fixed shadow-[2px_2px_0px_0px_rgba(26,26,26,1)] py-4 flex flex-col items-center justify-center gap-2 px-2">
+                                <span className="material-symbols-outlined text-2xl text-on-surface">qr_code_scanner</span>
+                                <span className="font-label-lg text-label-lg text-on-surface text-center uppercase">Scan QR</span>
+                            </button>
+                        </div>
+                        <div className="flex-1 min-h-[120px] bg-surface-container border-2 border-dashed border-outline-variant flex flex-col items-center justify-center gap-2 p-4">
+                            <span className="material-symbols-outlined text-outline-variant text-3xl">image</span>
+                            <p className="font-body-md text-outline-variant text-center">Preview will appear here</p>
+                        </div>
+                    </main>
+                    <div className="fixed bottom-0 left-0 w-full z-40 px-margin-mobile py-4 bg-surface border-t-2 border-on-tertiary-fixed flex items-center justify-center">
+                        <button onClick={() => navigate('/closet')} className="hardware-btn w-full bg-brand-mint border-2 border-on-tertiary-fixed shadow-[4px_4px_0px_0px_rgba(26,26,26,1)] py-4 px-6 flex items-center justify-between">
+                            <span className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight">NEXT</span>
+                            <span className="material-symbols-outlined text-2xl text-on-surface">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            return (
+                <MemoryRouter>
+                    <div className="min-h-screen">
+                        <Routes>
+                            <Route path="/" element={<SplashPage />} />
+                            <Route path="/closet" element={<ClosetPage />} />
+                            <Route path="/style" element={<StylePage />} />
+                            <Route path="/result" element={<ResultPage />} />
+                            <Route path="/looks" element={<LooksPage />} />
+                            <Route path="/add" element={<AddItemPage />} />
+                        </Routes>
+                    </div>
+                </MemoryRouter>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
