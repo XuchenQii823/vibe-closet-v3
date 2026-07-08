@@ -65,11 +65,15 @@ export interface StyleSkill {
   color: string;
 }
 
-/** localStorage 元数据：onboarding 标记 + 自增计数器 + schema 版本。 */
+/** 界面语言：默认英文（en），可切中文（zh）。存于 meta，跨会话记忆。 */
+export type Lang = "en" | "zh";
+
+/** localStorage 元数据：onboarding 标记 + 自增计数器 + schema 版本 + 界面语言。 */
 export interface ClosetMeta {
   onboardingSeen: boolean;
   lookSerialCounter: number;
   schemaVersion: number;
+  lang: Lang;
 }
 
 // ===== /api/style 请求 / 响应约定 =====

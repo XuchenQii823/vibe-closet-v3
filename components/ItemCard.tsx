@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ClosetItem } from "@/lib/closet/types";
 import MaterialIcon from "./MaterialIcon";
+import ConfirmDialog from "./ConfirmDialog";
 
 // 单品卡：黑标题栏(类别+favorite) / 图区(object-contain) / 名称 + 材质 chip。
 // 1:1 还原原型卡片，并补：favorite 切换、图加载失败占位、删除（hover 出现）。
@@ -14,6 +15,8 @@ interface Props {
 
 export default function ItemCard({ item, onToggleFavorite, onDelete }: Props) {
   const [broken, setBroken] = useState(false);
+  // 删除二次确认：点 X 先开弹窗，确认后才真正删除（防误删，不可恢复操作）。
+  const [confirming, setConfirming] = useState(false);
 
   return (
     <div
@@ -72,12 +75,12 @@ export default function ItemCard({ item, onToggleFavorite, onDelete }: Props) {
         )}
       </div>
 
-      {/* 删除按钮（hover 出现，MVP 纠错用）*/}
+      {/* 删除按钮（hover 出现，MVP 纠错用）：先开二次确认弹窗，不直接删 */}
       {onDelete && (
         <button
           onClick={(e) => {
             e.stopPropagation();
-            onDelete(item.id);
+            setConfirming(true);
           }}
           aria-label="删除单品"
           data-testid="closet-item-delete"
@@ -85,6 +88,20 @@ export default function ItemCard({ item, onToggleFavorite, onDelete }: Props) {
         >
           <MaterialIcon name="close" className="text-[14px]" />
         </button>
+      )}
+
+      {/* 删除二次确认弹窗 */}
+      {onDelete && (
+        <ConfirmDialog
+          open={confirming}
+          testId="closet-delete-confirm"
+          message={`确定删除「${item.name}」吗？删除后无法恢复。`}
+          onCancel={() => setConfirming(false)}
+          onConfirm={() => {
+            setConfirming(false);
+            onDelete(item.id);
+          }}
+        />
       )}
     </div>
   );

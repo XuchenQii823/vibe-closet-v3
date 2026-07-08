@@ -101,7 +101,11 @@
 - [x] **文字搭配在线真机回归（2026-05-31 通过）**：真实 Key 下 `/style(skill=1) → /result`：日志 `success{source:'ai', ms:1826}`，标题「复古优雅通勤」+ 切题中文理由（非兜底模板）；REGENERATE（`regenerate:true`）重出「复古粗花呢优雅」新结果；无「离线兜底」提示、Key 零泄露。两条 AI 链路（识图 + 文字搭配）均已在线验证。
 - [x] **Closet 双排横向滚动卡带（2026-06-02 完成）**：移动端两行横滚（`grid-flow-col grid-rows-2 auto-cols-[160px] overflow-x-auto`），`md+` 降级网格（`md:grid-cols-4 lg:grid-cols-6`）；实测 scrollWidth>clientWidth 可横滚、桌面无横滚 6 列。
 - [x] **ADD NEW ITEMS 常驻吸底（2026-06-02 完成）**：从随内容滚动改为 `fixed bottom-20` 吸底栏，浮在 3-Tab 之上随时可点，正文 `pb-40` 避让；实测按钮底距视口底 80px、点击跳 `/add`。
-- [ ] **删除二次确认**：单品 / look 删除目前无确认弹窗，误删不可恢复（用户暂不做，2026-06-02）。
+- [x] **删除二次确认（2026-06-30 完成）**：单品 / look 删除前弹出二次确认，防误删。
+  - 新增共享组件 `components/ConfirmDialog.tsx`（复古边框弹窗 + 警示标题栏 + 取消/删除双按钮；Esc 取消、点遮罩取消）。
+  - 关键修复：弹窗用 `createPortal` 挂到 `document.body`——否则它作为卡片子节点，会被「卡片 hover 时 `-translate-y-1` 变换」拖着 `position:fixed` 一起偏移/抖动（playwright 报 element not stable）。
+  - 接入 `ItemCard`（`closet-delete-confirm`）与 `LookCard`（`looks-delete-confirm`）：点删除按钮不再直接删，先开弹窗，确认后才调 `onDelete`。
+  - 验证（playwright 390×844）：单品删除「取消」→ 弹窗关、storage 仍 1 件；「确认」→ storage 清零、卡片消失、显示空衣橱态；弹窗经 Portal 挂在 body 下。lint/tsc/build 全过。
 - [x] **Scrapbook 拼贴精修（2026-06-02 完成）**：
   - Result 的 ScrapbookLayout 从 flex 平铺等大卡改为**绝对定位错落叠放心情板**（最多 5 片，响应式百分比槽位、大小不一、z 层级、类别标签、hover 抬升复彩）；实测 2 件对角、3 件叠放均衡。
   - LookCard（/looks 收藏卡）拼贴**同步升级**为相同的百分比响应式错落叠放槽位（之前是固定 px 槽位、对比不够），实测每卡 3 片尺寸明显不一、绝对定位叠放；不足 3 件用标题徽标补位。
@@ -137,7 +141,31 @@
 - [x] 验证：lint/build 通过；多次生成均**无空白加载**（`style-loading` 不再长驻）、3 套即时渲染、AI 标题确认后台替换、控制台确认后台请求。`fallback.ts` 仍同时被服务端 route 与客户端 result 复用（无 server-only 依赖）。
 - 已知后续候选（原 PRD §6 Roadmap）：高级 AI Style Skills、Scrapbook 高清导出分享、电商补缺件、虚拟换装图像合成、拍照自动识别品类、localStorage→IndexedDB 迁移、自定义 Style Skills、场景/天气条件。
 
+### 开机动画每次都播（2026-06-30 完成）
+- 背景：原 `app/page.tsx` 有「已看过 onboarding（`meta.onboardingSeen`）则 `router.replace('/closet')` 自动跳过」逻辑，导致刷新首页直达衣橱、看不到开机页。
+- [x] 应产品要求移除该自动跳过逻辑：现在每次访问 `/` 都播放开机页（SYSTEM.INIT 终端面板 + 品牌页），点 CTA 才进 `/closet`。
+- [x] 顺手清理不再使用的 `useEffect` / `getMeta` 引用（仍保留点击时写 `onboardingSeen`，兼容其他模块读取）。
+- 验证：tsc 0 错误、首页 HTTP 200。
+
+### 确认弹窗配色协调化（2026-06-30 完成）
+- 背景：`ConfirmDialog` 用 `bg-error`(#ba1a1a 纯红) 标题栏与删除按钮，与 App 的薄荷/柔粉/黑体系冲突，视觉跳脱。
+- [x] 仅改颜色（结构/字号/边框不动）：标题栏 `bg-error→bg-brand-black`（同卡片标题栏）、警示图标 `text-brand-blush`；删除按钮 `bg-error→bg-brand-blush text-brand-black`；取消按钮维持中性。
+
+### 界面语言切换 EN/中（2026-06-30 完成）
+- 需求：顶栏原汉堡菜单按钮无功能，改造为语言切换。默认英文，点击切中文，跨会话记忆。范围＝主要界面（开机页 + 3 Tab）。
+- [x] 数据层：`ClosetMeta` 加 `lang: Lang('en'|'zh')`，默认 `en`；走 `getMeta/setMeta` 持久化（不直接读写 localStorage）。
+- [x] i18n 机制：新增 `lib/i18n/index.tsx`（中英词典 + `LanguageProvider` Context + `useLang()`，零依赖）；`app/providers.tsx` 客户端包裹层挂进根 `layout.tsx`；初始恒 `en` 避免 hydration 不匹配，挂载后读 meta。
+- [x] 顶栏 `TopAppBar`：`menu` 模式左键改为 🌐 `translate` 图标 + `toggleLang`；`back` 模式（add/result）保持返回，不受影响。
+- [x] 文案接入 `t()`：开机页（slogan/CTA）、Closet（空态/存储提示/ADD 入口）、Style（标题/副标题/空态/生成按钮）、Looks（标题/副标题/New Look/空态）、BottomNav（三 Tab 标签）。品牌词 VIBE CLOSET / SYSTEM.INIT 等装饰字保持原样。
+- [x] 验证（playwright 390×844，实时预览）：默认 EN（图标 translate、文案英文）→ 点 🌐 全站切中文且 `meta.lang='zh'` → 跨页面（Style 整页刷新）保持中文（持久化生效）→ 再点切回 EN。lint 0 / tsc 0。
+- 备注：风格技能卡内容（如「90S CHANEL CHIC」描述）属数据内容、不在本轮范围；如需可后续把 `STYLE_SKILLS` 也做成中英两版。`/add`、`/result` 流程页文案本轮未翻（见后续候选）。
+
 ## 开发进度
+
+### 2026-06-30（project-iterate）
+- 完成：① 移除开机页自动跳过 →「每次刷新都播开机动画」；② 实现「删除二次确认」（新增 `ConfirmDialog` 共享弹窗，接入单品卡 / 搭配卡，Portal 修复 fixed 抖动）；③ 确认弹窗配色协调化（红→品牌黑/柔粉）；④ Style/Looks 顶栏右键图标统一为 `add_box`；⑤ 顶栏汉堡键改造为 🌐 语言切换（EN 默认 / 中，主要界面 i18n，持久化）。
+- 验证：lint 0 / tsc 0；接入实时预览（`.claude/launch.json` + preview_start），playwright 390×844 实测删除确认、图标统一、语言切换与持久化均通过。
+- 备注：开发服务器在本环境会被偶发回收，需要时重启 `npm run dev`（或预览工具 preview_start）。`/add`、`/result` 文案与风格卡内容尚未做 i18n。
 
 ### 2026-05-31（03-project-develop 首版交付）
 - 完成：Next.js 脚手架 + 设计 token 落地 + 数据层（storage/closet/looks/meta/image/hooks）+ AI 引擎（siliconflow/fallback/route/client）+ 8 个公共组件 + 6 个页面 + API 代理。

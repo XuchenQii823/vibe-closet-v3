@@ -8,12 +8,14 @@ import MaterialIcon from "@/components/MaterialIcon";
 import SkillCard from "@/components/SkillCard";
 import { useCloset } from "@/lib/hooks/useCloset";
 import { STYLE_SKILLS, DEFAULT_SKILL_ID } from "@/lib/style/skills";
+import { useLang } from "@/lib/i18n";
 
 // STYLE 风格选择（/style）：4 预设 skill 单选 + Generate CTA + 单品数量校验(≥2)。
 // 默认高亮 Poolside Retro，保证 AI 有明确风格方向。1:1 还原原型。
 export default function StylePage() {
   const router = useRouter();
   const { items, ready } = useCloset();
+  const { t } = useLang();
   const [selected, setSelected] = useState<number>(DEFAULT_SKILL_ID);
 
   const enoughItems = items.length >= 2;
@@ -33,14 +35,14 @@ export default function StylePage() {
         backgroundSize: "16px 16px",
       }}
     >
-      <TopAppBar />
+      <TopAppBar rightAction="add" />
       <main className="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop w-full">
         <div className="mb-8 border-2 border-on-tertiary-fixed bg-surface-container-lowest p-4 hard-shadow-sm">
           <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-on-tertiary-fixed uppercase">
-            CHOOSE YOUR VIBE
+            {t("style.heading")}
           </h2>
           <p className="font-body-md text-body-md text-on-surface-variant mt-2 border-t-2 border-on-tertiary-fixed pt-2">
-            Select a style skill to calibrate your algorithm.
+            {t("style.subtitle")}
           </p>
         </div>
 
@@ -52,13 +54,13 @@ export default function StylePage() {
           >
             <MaterialIcon name="checkroom" className="text-4xl text-outline" />
             <p className="font-body-md text-body-md text-on-surface-variant">
-              先去 CLOSET 添加至少 2 件单品，AI 才能为你搭配。
+              {t("style.needItems")}
             </p>
             <button
               onClick={() => router.push("/closet")}
               className="bg-brand-mint border-2 border-on-tertiary-fixed shadow-[2px_2px_0px_0px_rgba(26,26,26,1)] px-6 py-2 font-label-lg text-label-lg uppercase active:translate-x-px active:translate-y-px active:shadow-none transition-all"
             >
-              去衣橱添加
+              {t("style.goAdd")}
             </button>
           </div>
         )}
@@ -86,7 +88,7 @@ export default function StylePage() {
           }`}
         >
           <span className="font-label-lg text-label-lg text-on-tertiary-fixed uppercase">
-            Generate Look
+            {t("style.generate")}
           </span>
           <MaterialIcon
             name="auto_fix_high"

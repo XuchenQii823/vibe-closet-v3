@@ -10,6 +10,7 @@ import ItemCard from "@/components/ItemCard";
 import { useCloset } from "@/lib/hooks/useCloset";
 import { filterItems } from "@/lib/closet/items";
 import { Filter } from "@/lib/closet/types";
+import { useLang } from "@/lib/i18n";
 
 // CLOSET 数字衣橱（/closet）：chips 筛选 + 双排横滚卡带 + 空态 + ADD 入口。
 // 布局：整页 flex-col 撑满视口；chips 在顶部，放大的双排卡带在剩余空间里「垂直居中」填补空隙，
@@ -18,6 +19,7 @@ export default function ClosetPage() {
   const router = useRouter();
   const { items, ready, storageOk, remove, toggle, error, clearError } =
     useCloset();
+  const { t } = useLang();
   const [filter, setFilter] = useState<Filter>("All");
 
   const visible = useMemo(() => filterItems(items, filter), [items, filter]);
@@ -34,7 +36,7 @@ export default function ClosetPage() {
         {/* 存储不可用提示（隐私模式 / 已满）*/}
         {!storageOk && ready && (
           <div className="mb-4 border-2 border-error bg-error-container text-on-error-container p-3 font-label-sm text-label-sm">
-            存储不可用：当前为临时模式，关闭页面后数据可能丢失。
+            {t("closet.storageUnavailable")}
           </div>
         )}
         {error && (
@@ -60,17 +62,17 @@ export default function ClosetPage() {
               <MaterialIcon name="checkroom" className="text-5xl text-outline" />
               <div>
                 <h2 className="font-headline-sm text-headline-sm uppercase text-on-tertiary-fixed">
-                  衣橱是空的
+                  {t("closet.emptyTitle")}
                 </h2>
                 <p className="font-body-md text-body-md text-on-surface-variant mt-1">
-                  拍下第一件单品，开始搭建数字衣橱。
+                  {t("closet.emptyDesc")}
                 </p>
               </div>
               <button
                 onClick={() => router.push("/add")}
                 className="bg-brand-mint border-2 border-on-tertiary-fixed shadow-[2px_2px_0px_0px_rgba(26,26,26,1)] px-6 py-2 font-label-lg text-label-lg uppercase active:translate-x-px active:translate-y-px active:shadow-none transition-all"
               >
-                去添加单品
+                {t("closet.emptyCta")}
               </button>
             </div>
           ) : (
@@ -110,10 +112,10 @@ export default function ClosetPage() {
             </div>
             <div className="text-left">
               <h2 className="font-headline-sm text-headline-sm uppercase tracking-tight text-on-tertiary-fixed leading-none">
-                Add New Items
+                {t("closet.addTitle")}
               </h2>
               <p className="font-label-sm text-label-sm uppercase text-on-tertiary-fixed opacity-70 mt-0.5">
-                Tap to snap your wardrobe
+                {t("closet.addSubtitle")}
               </p>
             </div>
           </div>

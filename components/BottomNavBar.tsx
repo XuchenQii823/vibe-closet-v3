@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import MaterialIcon from "./MaterialIcon";
+import { useLang } from "@/lib/i18n";
 
 // 底部固定 3-Tab（80px / h-20）：/result 时 Style 仍高亮。1:1 还原原型。
 interface NavItemProps {
@@ -43,6 +44,7 @@ function NavItem({ to, icon, label, isActive, testId }: NavItemProps) {
 
 export default function BottomNavBar() {
   const path = usePathname();
+  const { t } = useLang();
 
   return (
     <nav
@@ -52,21 +54,21 @@ export default function BottomNavBar() {
       <NavItem
         to="/closet"
         icon="checkroom"
-        label="Closet"
+        label={t("nav.closet")}
         isActive={path === "/closet"}
         testId="nav-closet"
       />
       <NavItem
         to="/style"
         icon="auto_fix_high"
-        label="Style"
+        label={t("nav.style")}
         isActive={path === "/style" || path === "/result"}
         testId="nav-style"
       />
       <NavItem
         to="/looks"
         icon="style"
-        label="Looks"
+        label={t("nav.looks")}
         isActive={path === "/looks"}
         testId="nav-looks"
       />

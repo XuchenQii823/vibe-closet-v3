@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import Providers from "./providers";
 
 export const metadata: Metadata = {
   title: "VIBE CLOSET - Your Digital Wardrobe",
@@ -17,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-CN" className="light">
+    <html lang="en" className="light">
       <head>
         {/* 与原型一致：Material Symbols + Space Mono + DM Sans，
             用 <link> 直引保证字体/图标 100% 对齐 HTML 原型 */}
@@ -37,7 +38,7 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body-md text-brand-black antialiased">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

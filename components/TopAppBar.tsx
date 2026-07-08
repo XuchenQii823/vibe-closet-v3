@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import MaterialIcon from "./MaterialIcon";
+import { useLang } from "@/lib/i18n";
 
 // 顶部固定栏（56px / h-14）：黑底 + 薄荷品牌名，1:1 还原原型 TopAppBar。
 interface Props {
@@ -20,6 +21,12 @@ export default function TopAppBar({
   onRightClick,
 }: Props) {
   const router = useRouter();
+  const { toggle: toggleLang, t } = useLang();
+
+  // 左上角按钮：
+  // - back 模式（add/result 等流程页）：保持「返回」语义。
+  // - menu 模式（原汉堡，splash + 3 个 Tab）：改为语言切换 🌐，点击在 英/中 间切换。
+  const isBack = leftAction === "back";
 
   return (
     <header
@@ -27,12 +34,12 @@ export default function TopAppBar({
       className="fixed top-0 left-0 w-full z-[60] flex justify-between items-center px-margin-mobile h-14 bg-brand-black text-on-tertiary border-b-2 border-brand-black shrink-0"
     >
       <button
-        onClick={onLeftClick}
-        aria-label={leftAction === "back" ? "返回" : "菜单"}
+        onClick={isBack ? onLeftClick : onLeftClick ?? toggleLang}
+        aria-label={isBack ? "返回" : t("topbar.langToggle")}
         className="hover:opacity-80 active:translate-y-px transition-transform flex items-center justify-center"
       >
         <MaterialIcon
-          name={leftAction === "back" ? "arrow_back" : "menu"}
+          name={isBack ? "arrow_back" : "translate"}
           className="text-on-tertiary"
         />
       </button>

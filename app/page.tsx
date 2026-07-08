@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import TopAppBar from "@/components/TopAppBar";
 import BottomNavBar from "@/components/BottomNavBar";
 import MaterialIcon from "@/components/MaterialIcon";
-import { getMeta, setMeta } from "@/lib/closet/meta";
+import { setMeta } from "@/lib/closet/meta";
+import { useLang } from "@/lib/i18n";
 
 // Splash / 开机页（/）：SYSTEM.INIT 终端面板 + 品牌 + 主视觉 + 单 CTA。1:1 还原原型。
 const SPLASH_IMG =
@@ -13,13 +13,11 @@ const SPLASH_IMG =
 
 export default function SplashPage() {
   const router = useRouter();
+  const { t } = useLang();
 
-  // 二次启动直达 /closet：已看过 onboarding 则自动跳过（≤ 即时）。
-  useEffect(() => {
-    if (getMeta().onboardingSeen) {
-      router.replace("/closet");
-    }
-  }, [router]);
+  // 注意：此前这里有「已看过 onboarding 则自动跳过 /closet」的逻辑，
+  // 应产品要求改为「每次进首页都播放开机页」，故移除自动跳过。
+  // 仍保留下方写 onboardingSeen 标记，避免其他模块读取该字段时为空。
 
   const enter = () => {
     // 写标记失败（隐私模式）不阻断进入
@@ -60,7 +58,7 @@ export default function SplashPage() {
               </h2>
               <div className="h-0.5 w-full bg-brand-black my-2" />
               <p className="font-body-md text-body-md font-bold text-tertiary">
-                用你已有的衣服，穿出设计师的样子
+                {t("splash.slogan")}
               </p>
             </div>
 
@@ -84,7 +82,7 @@ export default function SplashPage() {
               onClick={enter}
               className="w-full py-4 bg-brand-mint retro-border hard-shadow btn-press font-headline-sm text-headline-sm uppercase tracking-wide flex items-center justify-center gap-2 group transition-all"
             >
-              立即开启数字衣橱{" "}
+              {t("splash.cta")}{" "}
               <MaterialIcon
                 name="arrow_forward"
                 className="group-hover:translate-x-1 transition-transform"

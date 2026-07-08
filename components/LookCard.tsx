@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { Look, ClosetItem } from "@/lib/closet/types";
 import { formatSerial } from "@/lib/closet/looks";
 import MaterialIcon from "./MaterialIcon";
 import ScrapbookCollage from "./ScrapbookCollage";
+import ConfirmDialog from "./ConfirmDialog";
 
 // Look 卡：黑标题栏(L-0XX // 名称 + favorite) + Scrapbook 拼贴预览 + 元信息。
 // 拼贴复用 ScrapbookCollage，与 /result 生成时完全一致（最多 5 片、带类别标签、按体积排序叠放）。
@@ -22,6 +24,8 @@ export default function LookCard({
   onDelete,
 }: Props) {
   const missingCount = look.itemIds.length - items.length;
+  // 删除二次确认：点删除图标先开弹窗，确认后才真正删除（防误删，不可恢复）。
+  const [confirming, setConfirming] = useState(false);
 
   return (
     <article
@@ -46,7 +50,7 @@ export default function LookCard({
           </button>
           {onDelete && (
             <button
-              onClick={() => onDelete(look.id)}
+              onClick={() => setConfirming(true)}
               aria-label="删除搭配"
               data-testid="looks-card-delete"
             >
@@ -55,6 +59,21 @@ export default function LookCard({
           )}
         </div>
       </div>
+
+      {/* 删除二次确认弹窗 */}
+      {onDelete && (
+        <ConfirmDialog
+          open={confirming}
+          testId="looks-delete-confirm"
+          title="确认删除搭配"
+          message={`确定删除「${formatSerial(look.serial)} ${look.title}」这套搭配吗？删除后无法恢复（衣橱单品不受影响）。`}
+          onCancel={() => setConfirming(false)}
+          onConfirm={() => {
+            setConfirming(false);
+            onDelete(look.id);
+          }}
+        />
+      )}
 
       {/* Scrapbook 拼贴区：与 /result 共用同一组件，样式完全一致 */}
       {items.length === 0 ? (
