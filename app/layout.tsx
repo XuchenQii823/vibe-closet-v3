@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import PhoneFrame from "@/components/PhoneFrame";
 import Providers from "./providers";
 
 export const metadata: Metadata = {
@@ -38,7 +39,9 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body-md text-brand-black antialiased">
-        <Providers>{children}</Providers>
+        <PhoneFrame>
+          <Providers>{children}</Providers>
+        </PhoneFrame>
       </body>
     </html>
   );

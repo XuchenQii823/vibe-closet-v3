@@ -12,6 +12,15 @@ const config: Config = {
     "./lib/**/*.{ts,tsx}",
   ],
   theme: {
+    // 项目现在作为作品集里的固定手机 Demo 呈现：真实浏览器再宽，也不触发桌面断点。
+    // 内部唯一布局基准是 iPhone 17 Pro 402×874，由 PhoneFrame 承载。
+    screens: {
+      sm: "99999px",
+      md: "99999px",
+      lg: "99999px",
+      xl: "99999px",
+      "2xl": "99999px",
+    },
     extend: {
       colors: {
         "on-error-container": "#93000a",

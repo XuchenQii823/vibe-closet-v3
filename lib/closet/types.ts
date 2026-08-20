@@ -74,6 +74,13 @@ export interface ClosetMeta {
   lookSerialCounter: number;
   schemaVersion: number;
   lang: Lang;
+  /** 默认衣橱是否已经处理过：处理后即使用户删空，也不自动恢复。 */
+  defaultClosetSeeded: boolean;
+  /**
+   * 默认衣橱处理版本。仅 boolean 不足以区分“旧标记误置”和“用户已删除默认项”，
+   * 所以用版本号确认当前默认包确实已被本浏览器处理过。
+   */
+  defaultClosetSeedVersion: string | null;
 }
 
 // ===== /api/style 请求 / 响应约定 =====

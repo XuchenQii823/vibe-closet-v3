@@ -160,7 +160,50 @@
 - [x] 验证（playwright 390×844，实时预览）：默认 EN（图标 translate、文案英文）→ 点 🌐 全站切中文且 `meta.lang='zh'` → 跨页面（Style 整页刷新）保持中文（持久化生效）→ 再点切回 EN。lint 0 / tsc 0。
 - 备注：风格技能卡内容（如「90S CHANEL CHIC」描述）属数据内容、不在本轮范围；如需可后续把 `STYLE_SKILLS` 也做成中英两版。`/add`、`/result` 流程页文案本轮未翻（见后续候选）。
 
+### 固定 iPhone 17 Pro 手机画布展示（2026-08-18 完成）
+- 背景：项目未来会嵌入作品集，以手机大小 Demo 形式展示给访客；真实浏览器宽度不应触发桌面响应式布局。
+- [x] 新增全局 `PhoneFrame`：应用内容固定渲染在 `402×874` iPhone 17 Pro 内容画布内；外层轻量手机壳约 `434×906`，带黑边、侧键和硬投影。
+- [x] 小屏缩放：根据真实窗口宽高只等比缩放手机壳，内部布局仍按 `402×874` 运行，不做响应式重排。
+- [x] 禁用桌面断点：Tailwind `sm/md/lg/xl/2xl` 提升到 `99999px`，避免 `/closet`、`/style`、`/looks` 在作品集桌面环境变成多列桌面版。
+- [x] fixed 元素收口：`.phone-screen` 通过 `transform: translateZ(0)` 成为 fixed 定位参照；TopAppBar、BottomNavBar、`/add` 保存条、`/style` 生成按钮均限制在手机屏幕内。
+- [x] Closet 卡带收口：`/closet` 默认单品卡片区不再使用 `vw` 或 `md/lg` fallback，固定为 `auto-cols-[160px]` 双排横滚，只按 402px 手机画布展示。
+- [x] 弹窗收口：`ConfirmDialog` Portal 改挂 `#phone-viewport-root`，删除确认遮罩只覆盖手机画布，不覆盖作品集外层页面。
+- [x] **底部导航滚动漂移修复（2026-08-20）**：`phone-screen` 保持非滚动 fixed 定位参照，新增显式 `phone-scroll-root` 承接页面内部滚动；避免 `/result`、`/looks` 长内容滚动时 `BottomNavBar` 被内容带走。
+- [x] 验证：`npm run typecheck` 通过；`npm run lint` 0 warning/error；`npm run build` 成功；`http://127.0.0.1:3002` HTTP 200；HTML 已包含 `phone-frame` / `phone-viewport`。
+- [x] **Cursor 预览空白修复（2026-08-19）**：首屏不再强制 `scale(1)`。JS 量到窗口前用 CSS `scale(min(1, 100vw/434px, 100vh/906px))`；`.phone-stage` 增加 `100vh` 兜底，避免内嵌预览不支持 `dvh` / 小窗口被 `overflow:hidden` 裁成空白。
+- 嵌入建议：作品集 iframe/container 推荐预留约 `440×930`，项目自身已负责手机壳、固定尺寸和小屏缩放。
+
+### 默认衣橱预置数据（2026-08-20 完成）
+- 背景：新用户首次进入 App 时应能直接体验生成 Looks，不需要先手动逐张导入衣服图片。
+- [x] 将 `cloth_pics_Default/` 中 17 张已选素材复制到 `public/closet-defaults/`，统一使用稳定英文文件名，默认单品图片以 public URL 引用，不写入 base64，避免撑大 `localStorage`。
+- [x] 新增 `lib/closet/defaultItems.ts`，导出固定 id 的 `DEFAULT_CLOSET_ITEMS`；分类覆盖 Accessories / Tops / Outerwear / Bottoms，本批不强行伪造 Shoes。
+- [x] `ClosetMeta` 增加 `defaultClosetSeeded` 标记，默认 `false`；数据初始化经 `ensureDefaultItemsSeeded()` 完成，页面/组件仍不直接读写 `localStorage`。
+- [x] 初始化策略：若已 seed 直接返回现有 items；若用户已有衣橱，只标记已处理、不合并默认项；若首次空衣橱，写入 17 件默认单品并标记已处理；用户删除默认单品后刷新不自动恢复。
+- [x] 增加脱敏调试日志：只记录默认数据初始化入口、item 数量、seed 状态、处理原因和错误摘要，不记录图片内容或隐私原文。
+- [x] 验证：默认 item 数 17、图片引用 17、public 资源 17、无缺失/重复 id；`npm run typecheck` 通过；`npm run lint` 0 warning/error；`npm run build` 成功；`http://127.0.0.1:3002/closet` HTTP 200。
+- [x] **本地旧状态修复（2026-08-20）**：`defaultClosetSeeded=true` 但缺少当前默认包版本号、且 `items=[]` 时，自动补 seed 一次；之后写入 `defaultClosetSeedVersion`，用户再删除默认项仍不会自动恢复。
+
 ## 开发进度
+
+### 2026-08-20（project-iterate）
+- 完成：接入首次空衣橱默认数据。新增 17 张 public 默认素材、确定性默认单品模块、`defaultClosetSeeded` 元数据与 `ensureDefaultItemsSeeded()` 初始化流程；`useCloset()` 挂载时通过数据层触发初始化。
+- 行为边界：只在首次“空衣橱且未处理默认数据”时写入默认项；已有用户衣橱不会被合并默认项；删除默认项后不会自动恢复。
+- 验证：默认数据一致性检查通过（17 ids / 17 image refs / 17 assets / 0 missing / 0 duplicate）；`npm run typecheck` 通过；`npm run lint` 0 warning/error；`npm run build` 成功；避让端口 `3002` 的 `/closet` 返回 HTTP 200。
+- 作品集嵌入影响：默认数据来自 `public/closet-defaults/`，部署后用户在任何设备首次打开该项目网址，空衣橱都会看到同一批预置单品；之后仍按各自浏览器本地 `localStorage` 独立保存删除/新增状态。
+- 追加修复：真实 in-app browser 复现空态，console 只出现 `check` 未出现 `seeded`，定位为本地旧 `defaultClosetSeeded` boolean 标记缺少版本号导致跳过；补 `defaultClosetSeedVersion` 后刷新 `/closet`，DOM 验证 `closet-item-card=17`、`closet-empty-state=false`、图片 URL 指向 `/closet-defaults/...`。
+- 追加修复：`/closet` 卡带列宽从 `44vw` 改为固定 `160px`，并移除 `md/lg` 桌面网格 fallback；真实 in-app browser 验证 `grid-auto-columns=160px`、双排横滚稳定，不再随真实浏览器视口重算卡片宽度。
+- 追加修复：底部导航滚动漂移。将手机屏幕裁切层与页面滚动层拆开，`phone-screen` 不再滚动，新增 `phone-scroll-root` 作为唯一内部滚动容器；真实 in-app browser 验证 `/result?skill=1` 滚动 `650px` 后、`/looks` 滚动到底后 `bottom-nav` 坐标不变且 `navBottomDelta=0`，`/closet` 无纵向溢出且底栏贴合手机画布底部。
+
+### 2026-08-19（debug：Cursor localhost 预览空白）
+- 现象：Cursor 里打开 `http://localhost:3000` 看不到内容。
+- 原因：首次 `next dev` 编译 `/` 约 195s，期间 HTTP 不返回，预览一直空白；叠加手机壳首屏 `scale(1)` + `overflow:hidden`，小预览窗口也可能把 906px 高的壳裁掉。
+- 处理：等编译完成后页面已 200；补 CSS 首屏缩放与 `100vh` 兜底。请刷新预览。
+- 下轮建议：继续 TODO 未完成项，或按需做 `/add` `/result` i18n。
+
+### 2026-08-18（project-iterate）
+- 完成：实现固定 iPhone 17 Pro 展示模式。新增 `PhoneFrame` 全局手机壳，内容固定 `402×874`；禁用桌面响应式断点；将 fixed 导航、吸底按钮、确认弹窗限制在手机画布内。
+- 验证：`npm run typecheck` 通过；`npm run lint` 0 warning/error；`npm run build` 成功；避让端口 `3002` 返回 HTTP 200；服务端 HTML 可见 `phone-frame` / `phone-viewport`。
+- 作品集嵌入建议：直接 iframe 当前项目地址即可，外部容器建议约 `440×930`；如需要更强展示感，可在作品集外层再加标题、说明和交互提示，不需要再改项目内部响应式。
 
 ### 2026-06-30（project-iterate）
 - 完成：① 移除开机页自动跳过 →「每次刷新都播开机动画」；② 实现「删除二次确认」（新增 `ConfirmDialog` 共享弹窗，接入单品卡 / 搭配卡，Portal 修复 fixed 抖动）；③ 确认弹窗配色协调化（红→品牌黑/柔粉）；④ Style/Looks 顶栏右键图标统一为 `add_box`；⑤ 顶栏汉堡键改造为 🌐 语言切换（EN 默认 / 中，主要界面 i18n，持久化）。

@@ -45,7 +45,11 @@ export default function ConfirmDialog({
 
   if (!open || !mounted) return null;
 
-  // 用 Portal 挂到 body：避免被「卡片 hover 时的 translate 变换」拖着 fixed 弹窗一起偏移/抖动。
+  const portalRoot =
+    document.getElementById("phone-viewport-root") ?? document.body;
+
+  // 用 Portal 挂到手机画布根节点：既避免被卡片 hover transform 拖动，
+  // 也让 fixed 遮罩只覆盖 402×874 的 iPhone 屏幕，不盖住作品集页面。
   return createPortal(
     // 全屏遮罩：点空白处＝取消（误点也安全）
     <div
@@ -90,6 +94,6 @@ export default function ConfirmDialog({
         </div>
       </div>
     </div>,
-    document.body
+    portalRoot
   );
 }

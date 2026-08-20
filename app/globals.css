@@ -3,17 +3,125 @@
 @tailwind utilities;
 
 /* ===== 全局基底（移植自原型 <style>）===== */
-/* 页面底色：温暖纸感米色；最小高度对齐移动端基准 884px，保证 splash 等竖向居中 */
+/* 页面底色：温暖纸感米色；真实浏览器只承载作品集舞台，App 自身固定在手机画布里 */
 html,
 body {
   background-color: #f5e7dc;
-  min-height: max(884px, 100dvh);
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
 }
 
 body {
   color: #1a1a1a;
+  margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== iPhone 17 Pro 固定展示壳 ===== */
+/* 为什么用外层手机壳：未来 iframe 进作品集时，项目自己就能保持 402×874 的手机尺寸，
+   不再随着作品集页面宽度触发桌面布局。小屏只缩放外壳，内部排版不重排。 */
+.phone-stage {
+  width: 100vw;
+  height: 100vh; /* 先给不支持 dvh 的内嵌预览（如 Cursor Simple Browser）兜底 */
+  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(168, 218, 208, 0.45), transparent 28%),
+    radial-gradient(circle at 85% 90%, rgba(242, 201, 203, 0.45), transparent 30%),
+    #f5e7dc;
+}
+
+.phone-device {
+  position: relative;
+  width: 434px;
+  height: 906px;
+  padding: 14px;
+  border: 2px solid #1a1a1a;
+  border-radius: 46px;
+  background: #111111;
+  box-shadow:
+    6px 6px 0 #1a1a1a,
+    0 24px 70px rgba(26, 26, 26, 0.28);
+  /* JS 量到窗口前先用 CSS 缩放：避免 Cursor 预览首屏仍是 906px 高、被 overflow:hidden 裁成空白 */
+  transform: scale(max(0.1, min(1, 100vw / 434px, 100vh / 906px)));
+  transform-origin: center;
+  transition: transform 160ms ease;
+}
+
+.phone-screen {
+  position: relative;
+  width: var(--phone-screen-w, 402px);
+  height: var(--phone-screen-h, 874px);
+  overflow-x: hidden;
+  overflow-y: hidden;
+  border-radius: 34px;
+  background: #fff8f4;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  /* 这个 transform 是关键：它让内部 position: fixed 以手机屏幕为参照。
+     注意：phone-screen 本身不能滚动；真正滚动交给下一层页面根节点，
+     否则 fixed 底栏会被滚动内容带走。 */
+  transform: translateZ(0);
+}
+
+.phone-screen::-webkit-scrollbar,
+.phone-scroll-root::-webkit-scrollbar {
+  display: none;
+}
+
+/* 手机画布固定不动，只有显式滚动根节点负责内部滚动。
+   这样 BottomNavBar / TopAppBar / 吸底保存条都能继续以手机屏幕为 fixed 参照；
+   同时避免 ConfirmDialog 等 Portal 直挂 phone-screen 时被通用子选择器误设为滚动层。 */
+.phone-scroll-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.phone-side-button {
+  position: absolute;
+  width: 4px;
+  background: #1a1a1a;
+  border-radius: 999px;
+}
+
+.phone-side-button-left {
+  left: -5px;
+  top: 150px;
+  height: 72px;
+}
+
+.phone-side-button-right {
+  right: -5px;
+  top: 190px;
+  height: 96px;
+}
+
+/* Tailwind 的 h-screen/min-h-screen 默认指向真实浏览器视口。
+   在手机壳模式下统一改成 iPhone 17 Pro 内容高度，避免页面撑出手机画布。 */
+.phone-screen .h-screen {
+  height: var(--phone-screen-h, 874px) !important;
+}
+
+.phone-screen .min-h-screen {
+  min-height: var(--phone-screen-h, 874px) !important;
 }
 
 /* ===== 签名硬投影（物理位移阴影，非模糊环境光）===== */

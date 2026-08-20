@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ClosetItem } from "../closet/types";
 import {
   getItems,
+  ensureDefaultItemsSeeded,
   addItem as addItemFn,
   deleteItem as deleteItemFn,
   toggleFavorite as toggleFavoriteFn,
@@ -35,7 +36,7 @@ export function useCloset(): UseClosetResult {
 
   useEffect(() => {
     setStorageOk(isStorageAvailable());
-    setItems(getItems());
+    setItems(ensureDefaultItemsSeeded());
     setReady(true);
   }, []);
 

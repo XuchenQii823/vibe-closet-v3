@@ -8,6 +8,8 @@ const DEFAULT_META: ClosetMeta = {
   lookSerialCounter: 0,
   schemaVersion: SCHEMA_VERSION,
   lang: "en", // 默认英文；用户可在顶栏 🌐 切换为中文
+  defaultClosetSeeded: false,
+  defaultClosetSeedVersion: null,
 };
 
 /** 读取元数据，缺失字段用默认值补齐（兼容旧 schema）。 */

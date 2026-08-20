@@ -76,14 +76,11 @@ export default function ClosetPage() {
               </button>
             </div>
           ) : (
-            // 双排横滚卡带（放大卡片）：
-            // 移动端 = 两行(grid-rows-2) + 按列填充(grid-flow-col) + 大列宽 + 横向滚动；
-            // md+ = 还原多列网格（取消固定列宽/横滚）作桌面 fallback。
+            // 固定手机画布内的双排横滚卡带：
+            // 列宽使用固定 160px，不再用 vw 或 md/lg fallback，避免嵌入作品集时跟真实浏览器宽度变化。
             <div
               data-testid="closet-scroll-row"
-              className="grid grid-flow-col grid-rows-2 auto-cols-[44vw] gap-4 overflow-x-auto hide-scrollbar snap-x
-                         md:grid-flow-row md:grid-rows-none md:auto-cols-auto md:overflow-x-visible md:grid-cols-4
-                         lg:grid-cols-6"
+              className="grid grid-flow-col grid-rows-2 auto-cols-[160px] gap-4 overflow-x-auto hide-scrollbar snap-x"
             >
               {visible.map((item) => (
                 <ItemCard
