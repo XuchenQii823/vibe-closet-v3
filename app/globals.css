@@ -26,6 +26,25 @@ body {
 /* 为什么用外层手机壳：未来 iframe 进作品集时，项目自己就能保持 402×874 的手机尺寸，
    不再随着作品集页面宽度触发桌面布局。小屏只缩放外壳，内部排版不重排。 */
 .phone-stage {
+  --liquid-pointer-x: 50%;
+  --liquid-pointer-y: 50%;
+  --liquid-pointer-active: 0;
+  --liquid-pointer-alpha: 0;
+  --liquid-pointer-wake: 0;
+  --liquid-wake-alpha: 0;
+  --liquid-cursor-scale: 0.72;
+  --liquid-shift-x: 0px;
+  --liquid-shift-y: 0px;
+  --liquid-shift-x-soft: 0px;
+  --liquid-shift-y-soft: 0px;
+  --liquid-shift-x-inverse: 0px;
+  --liquid-shift-y-inverse: 0px;
+  --liquid-wake-x: 0px;
+  --liquid-wake-y: 0px;
+  --liquid-wake-x-inverse: 0px;
+  --liquid-wake-y-inverse: 0px;
+  position: relative;
+  isolation: isolate;
   width: 100vw;
   height: 100vh; /* 先给不支持 dvh 的内嵌预览（如 Cursor Simple Browser）兜底 */
   height: 100dvh;
@@ -37,26 +56,367 @@ body {
   overflow: hidden;
   padding: 0;
   background:
-    radial-gradient(circle at 15% 10%, rgba(168, 218, 208, 0.45), transparent 28%),
-    radial-gradient(circle at 85% 90%, rgba(242, 201, 203, 0.45), transparent 30%),
-    #f5e7dc;
+    radial-gradient(circle at 50% 50%, rgba(255, 248, 244, 0.08), transparent 36%),
+    #09080f;
+}
+
+/* 手机背后的 Liquid Ether 风格舞台背景。
+   ReactBits 的 LiquidEther 是 three.js shader；这里用独立 CSS 背景层模拟：
+   深色 ether 底 + 高饱和液态 blob + 流动高光带，让效果在手机两侧也能明显可见。 */
+.liquid-ether-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at var(--liquid-pointer-x) var(--liquid-pointer-y),
+      rgb(255 255 255 / var(--liquid-pointer-alpha)) 0 3%,
+      rgb(168 218 208 / var(--liquid-pointer-alpha)) 8%,
+      rgb(242 201 203 / var(--liquid-wake-alpha)) 18%,
+      transparent 34%
+    ),
+    radial-gradient(circle at 18% 18%, rgba(168, 218, 208, 0.38), transparent 26%),
+    radial-gradient(circle at 84% 82%, rgba(242, 201, 203, 0.34), transparent 28%),
+    linear-gradient(135deg, #070812 0%, #101322 48%, #08070f 100%);
+}
+
+.liquid-ether-bg::before,
+.liquid-ether-bg::after {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  pointer-events: none;
+}
+
+.liquid-ether-bg::before {
+  background:
+    conic-gradient(
+      from 210deg at 52% 45%,
+      rgba(168, 218, 208, 0) 0deg,
+      rgba(168, 218, 208, 0.92) 42deg,
+      rgba(116, 144, 255, 0.75) 94deg,
+      rgba(242, 201, 203, 0.95) 156deg,
+      rgba(181, 128, 255, 0.74) 218deg,
+      rgba(168, 218, 208, 0.9) 292deg,
+      rgba(168, 218, 208, 0) 360deg
+    );
+  filter: blur(18px) saturate(1.55) contrast(1.1);
+  opacity: 0.78;
+  animation: liquid-ether-orbit 12s ease-in-out infinite alternate;
+}
+
+.liquid-ether-bg::after {
+  background:
+    linear-gradient(
+      118deg,
+      transparent 0 19%,
+      rgba(168, 218, 208, 0.46) 24%,
+      transparent 31% 42%,
+      rgba(242, 201, 203, 0.52) 48%,
+      transparent 56% 68%,
+      rgba(155, 132, 255, 0.45) 75%,
+      transparent 84% 100%
+    );
+  mix-blend-mode: screen;
+  filter: blur(14px);
+  opacity: 0.95;
+  animation: liquid-ether-shear 9s ease-in-out infinite alternate;
+}
+
+.liquid-ether-cursor {
+  position: absolute;
+  left: var(--liquid-pointer-x);
+  top: var(--liquid-pointer-y);
+  z-index: 1;
+  width: min(34vw, 330px);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle, rgb(255 255 255 / 0.9) 0 6%, transparent 7%),
+    radial-gradient(circle, rgb(168 218 208 / 0.72) 0 18%, rgb(242 201 203 / 0.34) 34%, transparent 66%);
+  filter: blur(16px) saturate(1.9);
+  mix-blend-mode: screen;
+  opacity: var(--liquid-pointer-active);
+  transform: translate(-50%, -50%) scale(var(--liquid-cursor-scale));
+  transition:
+    left 70ms linear,
+    top 70ms linear,
+    opacity 180ms ease,
+    transform 180ms ease;
+  will-change: left, top, opacity, transform;
+}
+
+.liquid-ether-cursor::after {
+  content: "";
+  position: absolute;
+  inset: 18%;
+  border-radius: 50%;
+  background:
+    linear-gradient(
+      105deg,
+      transparent 0 28%,
+      rgb(255 255 255 / var(--liquid-wake-alpha)) 48%,
+      rgb(168 218 208 / var(--liquid-wake-alpha)) 58%,
+      transparent 76% 100%
+    );
+  filter: blur(10px);
+  transform: translate(calc(-18% + var(--liquid-wake-x)), calc(-12% + var(--liquid-wake-y))) scaleX(1.42);
+  transition:
+    transform 140ms ease-out,
+    opacity 180ms ease;
+}
+
+.liquid-ether-blob,
+.liquid-ether-ribbon {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  will-change: transform, border-radius, opacity;
+}
+
+.liquid-ether-blob {
+  width: min(72vw, 740px);
+  aspect-ratio: 1;
+  border-radius: 44% 56% 62% 38% / 46% 38% 62% 54%;
+  filter: blur(20px) saturate(1.8);
+  mix-blend-mode: screen;
+}
+
+.liquid-ether-blob-a {
+  left: -16%;
+  top: -10%;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.72), transparent 0 11%, transparent 25%),
+    radial-gradient(circle at 52% 55%, rgba(168, 218, 208, 0.98), rgba(38, 181, 176, 0.58) 42%, transparent 68%);
+  opacity: 0.9;
+  animation: liquid-ether-blob-a 11s ease-in-out infinite alternate;
+}
+
+.liquid-ether-blob-b {
+  right: -18%;
+  top: 16%;
+  background:
+    radial-gradient(circle at 42% 34%, rgba(255, 255, 255, 0.55), transparent 0 10%, transparent 24%),
+    radial-gradient(circle at 55% 52%, rgba(242, 201, 203, 0.98), rgba(154, 108, 255, 0.56) 46%, transparent 72%);
+  opacity: 0.88;
+  animation: liquid-ether-blob-b 13s ease-in-out infinite alternate;
+}
+
+.liquid-ether-blob-c {
+  left: 18%;
+  bottom: -30%;
+  width: min(86vw, 900px);
+  background:
+    radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.48), transparent 0 9%, transparent 23%),
+    radial-gradient(circle at 48% 50%, rgba(130, 155, 255, 0.9), rgba(168, 218, 208, 0.56) 46%, transparent 72%);
+  opacity: 0.74;
+  animation: liquid-ether-blob-c 16s ease-in-out infinite alternate;
+}
+
+.liquid-ether-ribbon {
+  width: 120vw;
+  height: 20vh;
+  left: -10vw;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(168, 218, 208, 0.18),
+    rgba(255, 255, 255, 0.62),
+    rgba(242, 201, 203, 0.2),
+    transparent
+  );
+  filter: blur(16px);
+  mix-blend-mode: screen;
+}
+
+.liquid-ether-ribbon-a {
+  top: 17%;
+  transform: rotate(-16deg);
+  animation: liquid-ether-ribbon-a 10s ease-in-out infinite alternate;
+}
+
+.liquid-ether-ribbon-b {
+  bottom: 18%;
+  transform: rotate(18deg);
+  opacity: 0.76;
+  animation: liquid-ether-ribbon-b 12s ease-in-out infinite alternate;
+}
+
+@keyframes liquid-ether-orbit {
+  0% {
+    transform: translate3d(
+        calc(-7% + var(--liquid-shift-x-soft) + var(--liquid-wake-x)),
+        calc(-4% + var(--liquid-shift-y-soft) + var(--liquid-wake-y)),
+        0
+      )
+      rotate(0deg)
+      scale(1);
+  }
+  100% {
+    transform: translate3d(
+        calc(6% + var(--liquid-shift-x-soft) + var(--liquid-wake-x)),
+        calc(5% + var(--liquid-shift-y-soft) + var(--liquid-wake-y)),
+        0
+      )
+      rotate(22deg)
+      scale(1.12);
+  }
+}
+
+@keyframes liquid-ether-shear {
+  0% {
+    transform: translate3d(
+        calc(-4% + var(--liquid-shift-x-inverse) + var(--liquid-wake-x-inverse)),
+        calc(3% + var(--liquid-shift-y-inverse) + var(--liquid-wake-y-inverse)),
+        0
+      )
+      skewX(-8deg)
+      scale(1.02);
+  }
+  100% {
+    transform: translate3d(
+        calc(5% + var(--liquid-shift-x-inverse) + var(--liquid-wake-x-inverse)),
+        calc(-3% + var(--liquid-shift-y-inverse) + var(--liquid-wake-y-inverse)),
+        0
+      )
+      skewX(10deg)
+      scale(1.08);
+  }
+}
+
+@keyframes liquid-ether-blob-a {
+  0% {
+    transform: translate3d(
+        calc(-4% + var(--liquid-shift-x-soft) + var(--liquid-wake-x)),
+        calc(2% + var(--liquid-shift-y-soft) + var(--liquid-wake-y)),
+        0
+      )
+      rotate(-8deg)
+      scale(1);
+    border-radius: 44% 56% 62% 38% / 46% 38% 62% 54%;
+  }
+  100% {
+    transform: translate3d(
+        calc(12% + var(--liquid-shift-x-soft) + var(--liquid-wake-x)),
+        calc(10% + var(--liquid-shift-y-soft) + var(--liquid-wake-y)),
+        0
+      )
+      rotate(16deg)
+      scale(1.12);
+    border-radius: 62% 38% 42% 58% / 40% 58% 42% 60%;
+  }
+}
+
+@keyframes liquid-ether-blob-b {
+  0% {
+    transform: translate3d(
+        calc(4% + var(--liquid-shift-x-inverse) + var(--liquid-wake-x-inverse)),
+        calc(-2% + var(--liquid-shift-y-inverse) + var(--liquid-wake-y-inverse)),
+        0
+      )
+      rotate(12deg)
+      scale(1.04);
+    border-radius: 58% 42% 36% 64% / 52% 44% 56% 48%;
+  }
+  100% {
+    transform: translate3d(
+        calc(-10% + var(--liquid-shift-x-inverse) + var(--liquid-wake-x-inverse)),
+        calc(9% + var(--liquid-shift-y-inverse) + var(--liquid-wake-y-inverse)),
+        0
+      )
+      rotate(-18deg)
+      scale(1.16);
+    border-radius: 38% 62% 58% 42% / 60% 42% 58% 40%;
+  }
+}
+
+@keyframes liquid-ether-blob-c {
+  0% {
+    transform: translate3d(
+        calc(-6% + var(--liquid-shift-x) + var(--liquid-wake-x)),
+        calc(8% + var(--liquid-shift-y) + var(--liquid-wake-y)),
+        0
+      )
+      rotate(4deg)
+      scale(1);
+  }
+  100% {
+    transform: translate3d(
+        calc(8% + var(--liquid-shift-x) + var(--liquid-wake-x)),
+        calc(-8% + var(--liquid-shift-y) + var(--liquid-wake-y)),
+        0
+      )
+      rotate(-12deg)
+      scale(1.14);
+  }
+}
+
+@keyframes liquid-ether-ribbon-a {
+  0% {
+    transform: translate3d(
+        calc(-8% + var(--liquid-wake-x)),
+        calc(-18% + var(--liquid-wake-y)),
+        0
+      )
+      rotate(-16deg);
+  }
+  100% {
+    transform: translate3d(
+        calc(8% + var(--liquid-wake-x)),
+        calc(16% + var(--liquid-wake-y)),
+        0
+      )
+      rotate(-8deg);
+  }
+}
+
+@keyframes liquid-ether-ribbon-b {
+  0% {
+    transform: translate3d(
+        calc(7% + var(--liquid-wake-x-inverse)),
+        calc(14% + var(--liquid-wake-y-inverse)),
+        0
+      )
+      rotate(18deg);
+  }
+  100% {
+    transform: translate3d(
+        calc(-7% + var(--liquid-wake-x-inverse)),
+        calc(-14% + var(--liquid-wake-y-inverse)),
+        0
+      )
+      rotate(10deg);
+  }
 }
 
 .phone-device {
   position: relative;
+  z-index: 1;
   width: 434px;
   height: 906px;
   padding: 14px;
   border: 2px solid #1a1a1a;
   border-radius: 46px;
   background: #111111;
-  box-shadow:
-    6px 6px 0 #1a1a1a,
-    0 24px 70px rgba(26, 26, 26, 0.28);
+  box-shadow: 6px 0 0 #1a1a1a;
   /* JS 量到窗口前先用 CSS 缩放：避免 Cursor 预览首屏仍是 906px 高、被 overflow:hidden 裁成空白 */
   transform: scale(max(0.1, min(1, 100vw / 434px, 100vh / 906px)));
   transform-origin: center;
   transition: transform 160ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-ether-bg::before,
+  .liquid-ether-bg::after,
+  .liquid-ether-cursor,
+  .liquid-ether-blob,
+  .liquid-ether-ribbon {
+    animation: none;
+  }
 }
 
 .phone-screen {

@@ -169,6 +169,7 @@
 - [x] Closet 卡带收口：`/closet` 默认单品卡片区不再使用 `vw` 或 `md/lg` fallback，固定为 `auto-cols-[160px]` 双排横滚，只按 402px 手机画布展示。
 - [x] 弹窗收口：`ConfirmDialog` Portal 改挂 `#phone-viewport-root`，删除确认遮罩只覆盖手机画布，不覆盖作品集外层页面。
 - [x] **底部导航滚动漂移修复（2026-08-20）**：`phone-screen` 保持非滚动 fixed 定位参照，新增显式 `phone-scroll-root` 承接页面内部滚动；避免 `/result`、`/looks` 长内容滚动时 `BottomNavBar` 被内容带走。
+- [x] **Liquid Ether 舞台背景（2026-08-21）**：将手机壳背后的静态米色渐变替换为轻量 CSS 流体背景；不引入 Three.js/WebGL 依赖，避免增加作品集 Demo 运行风险。二次修复“视觉不明显”问题：新增独立 `.liquid-ether-bg` 层、5 个流体 blob/ribbon、深色 ether 底与更强色带动画。三次修复“光标无响应”问题：`PhoneFrame` 监听舞台 `pointermove`，把指针位置、速度和尾迹写入 CSS 变量，驱动 cursor glow、blob 与 ribbon 产生随光标流动的反馈。同步去掉手机壳底部投影，仅保留右侧硬件感偏移。
 - [x] 验证：`npm run typecheck` 通过；`npm run lint` 0 warning/error；`npm run build` 成功；`http://127.0.0.1:3002` HTTP 200；HTML 已包含 `phone-frame` / `phone-viewport`。
 - [x] **Cursor 预览空白修复（2026-08-19）**：首屏不再强制 `scale(1)`。JS 量到窗口前用 CSS `scale(min(1, 100vw/434px, 100vh/906px))`；`.phone-stage` 增加 `100vh` 兜底，避免内嵌预览不支持 `dvh` / 小窗口被 `overflow:hidden` 裁成空白。
 - 嵌入建议：作品集 iframe/container 推荐预留约 `440×930`，项目自身已负责手机壳、固定尺寸和小屏缩放。
@@ -184,6 +185,14 @@
 - [x] **本地旧状态修复（2026-08-20）**：`defaultClosetSeeded=true` 但缺少当前默认包版本号、且 `items=[]` 时，自动补 seed 一次；之后写入 `defaultClosetSeedVersion`，用户再删除默认项仍不会自动恢复。
 
 ## 开发进度
+
+### 2026-08-21（project-iterate）
+- 完成：按用户指定替换手机壳背后的舞台背景为 Liquid Ether 风格轻量动态背景；保留固定 iPhone 17 Pro 画布、手机壳、内部页面结构和导航逻辑不变。
+- 视觉处理：移除原 `.phone-stage` 静态 radial 背景，新增 `::before/::after` 多层流体渐变、blur、saturate 与 reduced-motion 降级；手机壳 `box-shadow` 从底部+右侧偏移改为仅右侧偏移，去掉底部阴影。
+- 验证：`npm run typecheck` 通过；`npm run lint` 0 warning/error；in-app browser 刷新 `/` 后确认 `.liquid-ether-bg` 位于手机后方，`liquid-ether-orbit/liquid-ether-shear` 动画生效，`phone-device` computed `box-shadow=rgb(26,26,26) 6px 0px 0px 0px`，截图确认背景不遮挡内容。
+- 二次修复：用户反馈背景变化不明显。定位为上一版颜色过浅、模糊半径过大、动画周期太慢且中心被手机壳遮挡；改为独立背景 DOM 层 `.liquid-ether-bg`，包含 3 个 blob + 2 条 ribbon + 深色底。复验：`childCount=5`、`beforeAnimation=liquid-ether-orbit`、`afterAnimation=liquid-ether-shear`，截图确认左右两侧能明显看到 Liquid Ether 风格流体背景。
+- 三次修复：用户反馈“能看到缓慢流动，但光标放上去没有原版随光标流动效果”。定位为上一版只有时间驱动 CSS 动画，缺少 pointer 输入链路；本轮新增 `pointermove/pointerleave` 追踪、RAF 节流、首次输入速度修正，以及 `--liquid-pointer-* / --liquid-wake-*` CSS 变量。复验：`npm run typecheck` 通过；`npm run lint` 0 warning/error；`npm run build` 成功；in-app browser 模拟鼠标移动后 `active=1`、指针坐标从 `16.55%/20.95%` 更新到 `80.69%/80.33%`，`wake` 约 `0.96~1.00`，blob/ribbon 位移变量同步更新。
+- 启动修复：用户反馈首页打不开，Next 错误页显示 `Cannot find module './379.js'`。定位为 `.next/server` 缓存 chunk 与 `webpack-runtime.js` 时间戳不一致、旧 dev server 卡在 3002；已停止旧 PID、将坏缓存备份到 `/private/tmp/vibe-closet-next-broken-20260821-cache-mismatch` 并重新 `npm run dev -- -p 3002` 生成缓存。复验：in-app browser 刷新 `/` 后 `nextError=false`、`phone-frame=true`、`liquid-ether-bg=true`；`npm run typecheck` 通过；`npm run lint` 0 warning/error。
 
 ### 2026-08-20（project-iterate）
 - 完成：接入首次空衣橱默认数据。新增 17 张 public 默认素材、确定性默认单品模块、`defaultClosetSeeded` 元数据与 `ensureDefaultItemsSeeded()` 初始化流程；`useCloset()` 挂载时通过数据层触发初始化。
